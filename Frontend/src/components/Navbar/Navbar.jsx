@@ -126,7 +126,6 @@ function Navbar({
     }
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showProfileDropdown && !event.target.closest(".profile-dropdown")) {

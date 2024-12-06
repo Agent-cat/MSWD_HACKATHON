@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 6,
+      select: false,
     },
     profilePicture: {
       type: String,
@@ -32,8 +33,16 @@ const userSchema = new mongoose.Schema(
 // Add comparePassword method to the schema
 userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
-    return await bcrypt.compare(candidatePassword, this.password);
+    console.log("Comparing passwords:", {
+      candidatePassword,
+      hashedPassword: this.password,
+    });
+
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    console.log("Password match result:", isMatch);
+    return isMatch;
   } catch (error) {
+    console.error("Password comparison error:", error);
     throw error;
   }
 };

@@ -39,11 +39,11 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create user
+    // Create user - let the User model handle password hashing
     user = new User({
       username,
       email,
-      password: await bcrypt.hash(password, 10),
+      password, // The pre-save middleware will hash this
     });
 
     await user.save();
@@ -73,9 +73,31 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
 
-    if (!user || !(await user.comparePassword(password))) {
+    // Debug log
+    console.log("Login attempt:", { email });
+
+    const user = await User.findOne({ email }).select("+password"); // Explicitly include password field
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Debug log
+    console.log("Found user:", {
+      id: user._id,
+      email: user.email,
+      hasPassword: !!user.password,
+    });
+
+    // Use the comparePassword method from the user model
+    const isPasswordValid = await user.comparePassword(password);
+
+    // Debug log
+    console.log("Password validation result:", isPasswordValid);
+
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
