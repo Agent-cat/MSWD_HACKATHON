@@ -29,18 +29,43 @@ function BuilderApp() {
     if (location.state?.project) {
       const { elements } = location.state.project;
       if (Array.isArray(elements)) {
-        updateElement(elements);
+        // Ensure all element properties are preserved
+        const completeElements = elements.map((element) => ({
+          ...element,
+          content: element.content || "",
+          styles: element.styles || {},
+          locked: element.locked || false,
+          hidden: element.hidden || false,
+        }));
+        updateElement(completeElements);
       }
     }
   }, [location.state]);
 
   const handleElementsUpdate = async (newElements) => {
     if (Array.isArray(newElements)) {
-      updateElement(newElements);
+      // Ensure all element properties are included
+      const completeElements = newElements.map((element) => ({
+        id: element.id,
+        type: element.type,
+        content: element.content || "",
+        x: element.x,
+        y: element.y,
+        width: element.width,
+        height: element.height,
+        styles: element.styles || {},
+        locked: element.locked || false,
+        hidden: element.hidden || false,
+        src: element.src, // For image elements
+        placeholder: element.placeholder, // For input elements
+      }));
+
+      updateElement(completeElements);
+
       if (location.state?.project?._id) {
         try {
           await projectService.updateProject(location.state.project._id, {
-            elements: newElements,
+            elements: completeElements,
           });
         } catch (error) {
           console.error("Error saving project:", error);
@@ -50,11 +75,23 @@ function BuilderApp() {
   };
 
   const handleStyleUpdate = (elementId, updates) => {
-    updateElement(elementId, updates);
-    const updatedElements = elements.map((el) =>
-      el.id === elementId ? { ...el, ...updates } : el
-    );
-    saveToCurrentProject(updatedElements);
+    const elementToUpdate = elements.find((el) => el.id === elementId);
+    if (elementToUpdate) {
+      const updatedElement = {
+        ...elementToUpdate,
+        ...updates,
+        styles: {
+          ...elementToUpdate.styles,
+          ...(updates.styles || {}),
+        },
+      };
+
+      const updatedElements = elements.map((el) =>
+        el.id === elementId ? updatedElement : el
+      );
+
+      handleElementsUpdate(updatedElements);
+    }
   };
 
   const saveToCurrentProject = (updatedElements) => {
