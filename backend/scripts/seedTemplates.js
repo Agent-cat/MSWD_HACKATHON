@@ -12,11 +12,20 @@ async function seedTemplates() {
     // Find admin user or create one
     let adminUser = await User.findOne({ email: "admin@example.com" });
     if (!adminUser) {
-      adminUser = await User.create({
-        username: "admin",
-        email: "admin@example.com",
-        password: "admin123",
-      });
+      try {
+        adminUser = await User.create({
+          username: "admin",
+          email: "admin@example.com",
+          password: "admin123",
+        });
+      } catch (error) {
+        // If creation fails due to duplicate username, try finding by username instead
+        if (error.code === 11000) {
+          adminUser = await User.findOne({ username: "admin" });
+        } else {
+          throw error;
+        }
+      }
     }
 
     // Delete existing templates

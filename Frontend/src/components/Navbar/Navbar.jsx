@@ -14,7 +14,6 @@ import {
   FaFolderOpen,
   FaImages,
 } from "react-icons/fa";
-import TemplateGallery from "../Templates/TemplateGallery";
 import ExportPanel from "../Editor/ExportPanel";
 import { getToken } from "../../utils/auth";
 import axios from "axios";
@@ -84,12 +83,6 @@ function Navbar({
     navigate("/login");
   };
 
-  const handleTemplateSelect = (template) => {
-    if (template && template.elements) {
-      onElementsUpdate(template.elements);
-    }
-  };
-
   const handleDelete = () => {
     setShowDeleteConfirm(true);
   };
@@ -127,11 +120,6 @@ function Navbar({
   return (
     <div className="flex items-center justify-between w-full h-14">
       <div className="flex-1 flex items-center justify-center space-x-4 overflow-x-auto scrollbar-hide">
-        <TemplateGallery
-          onSelectTemplate={handleTemplateSelect}
-          elements={elements}
-        />
-
         <div className="flex gap-2 bg-white rounded-lg p-1">
           <button
             onClick={() => onDeviceChange("375px")}
