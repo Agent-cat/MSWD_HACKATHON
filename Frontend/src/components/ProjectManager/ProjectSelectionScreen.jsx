@@ -11,6 +11,8 @@ function ProjectSelectionScreen() {
   const [loading, setLoading] = useState(true);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("Untitled Project");
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   useEffect(() => {
     loadProjects();
@@ -22,10 +24,9 @@ function ProjectSelectionScreen() {
       const loadedProjects = await projectService.getAllProjects();
       setProjects(loadedProjects);
     } catch (error) {
-      console.error("Error loading projects:", error);
       showToast(
-        error.response?.data?.message ||
-          "Failed to load projects. Please try again."
+        "Failed to load projects. Please check your connection and try again.",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -39,18 +40,27 @@ function ProjectSelectionScreen() {
 
   const handleProjectSelect = async (project) => {
     try {
+      showToast("Loading project...", "info");
       const currentProject = await projectService.getCurrentProject(
         project._id
       );
       navigate("/build", { state: { project: currentProject } });
     } catch (error) {
-      console.error("Error loading project:", error);
-      showToast("Failed to load project. Please try again.");
+      showToast(
+        "Unable to load project. The project may be corrupted or deleted.",
+        "error"
+      );
     }
   };
 
   const handleCreateNewConfirm = async () => {
+    if (!newProjectName.trim()) {
+      showToast("Project name cannot be empty", "error");
+      return;
+    }
+
     try {
+      showToast("Creating new project...", "info");
       const newProject = {
         name: newProjectName,
         elements: [],
@@ -60,26 +70,34 @@ function ProjectSelectionScreen() {
       navigate("/build", { state: { project: createdProject } });
       showToast("Project created successfully!", "success");
     } catch (error) {
-      console.error("Error creating project:", error);
-      showToast("Failed to create project. Please try again.");
+      showToast("Failed to create project. Please try again later.", "error");
     }
   };
 
   const handleDeleteProject = async (projectId, e) => {
     e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      try {
-        await projectService.deleteProject(projectId);
-        setProjects(projects.filter((project) => project._id !== projectId));
-        showToast("Project deleted successfully!", "success");
-      } catch (error) {
-        console.error("Error deleting project:", error);
-        showToast("Failed to delete project. Please try again.");
-      }
+    setProjectToDelete(projects.find((p) => p._id === projectId));
+    setShowConfirmDelete(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      showToast("Deleting project...", "info");
+      await projectService.deleteProject(projectToDelete._id);
+      setProjects(
+        projects.filter((project) => project._id !== projectToDelete._id)
+      );
+      showToast("Project deleted successfully!", "success");
+    } catch (error) {
+      showToast("Failed to delete project. Please try again later.", "error");
+    } finally {
+      setShowConfirmDelete(false);
+      setProjectToDelete(null);
     }
   };
 
   const handleCreateNew = () => {
+    setNewProjectName("Untitled Project");
     setShowNewProjectModal(true);
   };
 
@@ -145,15 +163,17 @@ function ProjectSelectionScreen() {
 
         {/* New Project Modal */}
         {showNewProjectModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 w-96">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Create New Project</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-8 w-[450px] shadow-2xl transform transition-all scale-95 animate-[modal-pop_0.3s_ease-out_forwards]">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Create New Project
+                </h2>
                 <button
                   onClick={() => setShowNewProjectModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <FaTimes />
+                  <FaTimes className="text-gray-500 hover:text-gray-700" />
                 </button>
               </div>
               <input
@@ -161,21 +181,59 @@ function ProjectSelectionScreen() {
                 value={newProjectName}
                 onChange={(e) => setNewProjectName(e.target.value)}
                 placeholder="Project Name"
-                className="w-full p-2 border border-gray-300 rounded mb-4"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg"
                 autoFocus
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowNewProjectModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  className="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateNewConfirm}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-sm"
                 >
                   Create Project
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showConfirmDelete && projectToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-8 w-[450px] shadow-2xl transform transition-all scale-95 animate-[modal-pop_0.3s_ease-out_forwards]">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Delete Project
+              </h2>
+              <p className="text-gray-600 mb-6 text-lg">
+                Are you sure you want to delete "
+                <span className="font-medium text-gray-900">
+                  {projectToDelete.name}
+                </span>
+                "?
+                <span className="block mt-2 text-red-500 text-base">
+                  This action cannot be undone.
+                </span>
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowConfirmDelete(false);
+                    setProjectToDelete(null);
+                  }}
+                  className="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium shadow-sm"
+                >
+                  Delete Project
                 </button>
               </div>
             </div>

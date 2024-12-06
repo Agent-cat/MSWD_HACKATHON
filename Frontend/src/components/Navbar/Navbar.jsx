@@ -13,6 +13,8 @@ import {
   FaSave,
   FaFolderOpen,
   FaImages,
+  FaExclamationCircle,
+  FaCheckCircle,
 } from "react-icons/fa";
 import ExportPanel from "../Editor/ExportPanel";
 import { getToken } from "../../utils/auth";
@@ -32,6 +34,12 @@ function Navbar({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [user, setUser] = useState(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     const token = getToken();
@@ -65,11 +73,16 @@ function Navbar({
         localStorage.setItem("user", JSON.stringify(userData));
         setUser(userData);
       } catch (error) {
-        console.error("Error fetching user data:", error);
         if (error.response?.status === 401) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          showNotification("Session expired. Please login again.", "error");
           navigate("/login");
+        } else {
+          showNotification(
+            "Failed to load user data. Please try again.",
+            "error"
+          );
         }
       }
     };
@@ -80,6 +93,7 @@ function Navbar({
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    showNotification("Successfully logged out");
     navigate("/login");
   };
 
@@ -91,17 +105,24 @@ function Navbar({
     if (selectedElement) {
       onDeleteElement(selectedElement.id);
       setShowDeleteConfirm(false);
+      showNotification(`${selectedElement.type} deleted successfully`);
     }
   };
 
   const handleSave = () => {
     const currentProject = localStorage.getItem("currentProject");
     if (currentProject) {
-      const project = JSON.parse(currentProject);
-      project.elements = elements;
-      project.lastModified = new Date().toISOString();
-      localStorage.setItem(project.id, JSON.stringify(project));
-      alert("Project saved successfully!");
+      try {
+        const project = JSON.parse(currentProject);
+        project.elements = elements;
+        project.lastModified = new Date().toISOString();
+        localStorage.setItem(project.id, JSON.stringify(project));
+        showNotification("Project saved successfully!");
+      } catch (error) {
+        showNotification("Failed to save project. Please try again.", "error");
+      }
+    } else {
+      showNotification("No active project to save", "error");
     }
   };
 
@@ -119,6 +140,23 @@ function Navbar({
 
   return (
     <div className="flex items-center justify-between w-full h-14">
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg z-[200] ${
+            notification.type === "error"
+              ? "bg-red-100 text-red-800"
+              : "bg-green-100 text-green-800"
+          }`}
+        >
+          {notification.type === "error" ? (
+            <FaExclamationCircle className="text-red-500" />
+          ) : (
+            <FaCheckCircle className="text-green-500" />
+          )}
+          <span>{notification.message}</span>
+        </div>
+      )}
+
       <div className="flex-1 flex items-center justify-center space-x-4 overflow-x-auto scrollbar-hide">
         <div className="flex gap-2 bg-white rounded-lg p-1">
           <button

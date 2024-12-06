@@ -13,16 +13,27 @@ function ProjectManager({ elements, onLoad }) {
   const [showProjects, setShowProjects] = useState(false);
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const saveProject = () => {
     if (!elements || elements.length === 0) {
-      alert("Cannot save an empty project");
+      showNotification("Cannot save an empty project", "error");
       return;
     }
     setShowNamePrompt(true);
   };
 
   const handleSaveConfirm = async () => {
+    if (!projectName.trim()) {
+      showNotification("Project name cannot be empty", "error");
+      return;
+    }
+
     const project = {
       name: projectName,
       elements: elements,
@@ -30,11 +41,11 @@ function ProjectManager({ elements, onLoad }) {
 
     try {
       await projectService.createProject(project);
-      alert("Project saved successfully!");
+      showNotification("Project saved successfully!");
       setShowNamePrompt(false);
     } catch (error) {
       console.error("Error saving project:", error);
-      alert("Failed to save project. Please try again.");
+      showNotification("Failed to save project. Please try again.", "error");
     }
   };
 
@@ -42,14 +53,14 @@ function ProjectManager({ elements, onLoad }) {
     try {
       const loadedProjects = await projectService.getAllProjects();
       if (loadedProjects.length === 0) {
-        alert("No saved projects found");
+        showNotification("No saved projects found", "info");
         return;
       }
       setProjects(loadedProjects);
       setShowProjects(true);
     } catch (error) {
       console.error("Error loading projects:", error);
-      alert("Failed to load projects. Please try again.");
+      showNotification("Failed to load projects. Please try again.", "error");
     }
   };
 
@@ -57,6 +68,7 @@ function ProjectManager({ elements, onLoad }) {
     setProjectName(project.name);
     onLoad(project.elements);
     setShowProjects(false);
+    showNotification(`Loaded project: ${project.name}`);
   };
 
   const deleteProject = async (projectId, e) => {
@@ -65,12 +77,16 @@ function ProjectManager({ elements, onLoad }) {
       try {
         await projectService.deleteProject(projectId);
         setProjects(projects.filter((project) => project._id !== projectId));
+        showNotification("Project deleted successfully");
         if (projects.length <= 1) {
           setShowProjects(false);
         }
       } catch (error) {
         console.error("Error deleting project:", error);
-        alert("Failed to delete project. Please try again.");
+        showNotification(
+          "Failed to delete project. Please try again.",
+          "error"
+        );
       }
     }
   };
@@ -97,6 +113,21 @@ function ProjectManager({ elements, onLoad }) {
           <FaFolderOpen /> Load
         </button>
       </div>
+
+      {/* Notification Toast */}
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+            notification.type === "error"
+              ? "bg-red-500 text-white"
+              : notification.type === "info"
+              ? "bg-blue-500 text-white"
+              : "bg-green-500 text-white"
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
 
       {/* Project Name Prompt Modal */}
       {showNamePrompt && (
