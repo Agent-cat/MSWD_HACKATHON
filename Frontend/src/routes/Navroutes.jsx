@@ -9,6 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import { getToken } from "../utils/auth";
 import ProjectSelectionScreen from "../components/ProjectManager/ProjectSelectionScreen";
+import TemplateGallery from "../components/Templates/TemplateGallery";
 
 const Navroutes = () => {
   return (
@@ -28,6 +29,7 @@ const Navroutes = () => {
         <Route path="/build" element={<BuilderApp />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/templates" element={<TemplateGallery />} />
       </Route>
 
       {/* Catch all route - Redirect based on auth status */}

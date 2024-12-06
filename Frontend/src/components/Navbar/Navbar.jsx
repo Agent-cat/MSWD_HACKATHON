@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   FaDownload,
   FaLayerGroup,
@@ -12,6 +12,7 @@ import {
   FaSignOutAlt,
   FaSave,
   FaFolderOpen,
+  FaImages,
 } from "react-icons/fa";
 import TemplateGallery from "../Templates/TemplateGallery";
 import ExportPanel from "../Editor/ExportPanel";
@@ -184,6 +185,14 @@ function Navbar({
             <span>Delete</span>
           </button>
         )}
+
+        <Link
+          to="/templates"
+          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+        >
+          <FaImages className="text-blue-500" />
+          <span>Templates</span>
+        </Link>
       </div>
 
       <div className="flex items-center gap-4 pr-4">
