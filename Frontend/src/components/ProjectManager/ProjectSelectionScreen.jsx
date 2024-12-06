@@ -13,6 +13,7 @@ function ProjectSelectionScreen() {
   const [newProjectName, setNewProjectName] = useState("Untitled Project");
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+  const [buildingProject, setBuildingProject] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -41,15 +42,22 @@ function ProjectSelectionScreen() {
   const handleProjectSelect = async (project) => {
     try {
       showToast("Loading project...", "info");
+      setBuildingProject(true);
       const currentProject = await projectService.getCurrentProject(
         project._id
       );
+
+      // Add artificial delay of 1.5s
+      await new Promise((resolve) => setTimeout(resolve, 5500));
+
       navigate("/build", { state: { project: currentProject } });
     } catch (error) {
       showToast(
         "Unable to load project. The project may be corrupted or deleted.",
         "error"
       );
+    } finally {
+      setBuildingProject(false);
     }
   };
 
@@ -108,7 +116,10 @@ function ProjectSelectionScreen() {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="relative w-24 h-24">
+              <div className="absolute top-0 left-0 w-full h-full border-8 border-blue-200 rounded-full animate-pulse"></div>
+              <div className="absolute top-0 left-0 w-full h-full border-t-8 border-blue-500 rounded-full animate-spin"></div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -237,6 +248,21 @@ function ProjectSelectionScreen() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {buildingProject && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+            <div className="relative w-24 h-24">
+              <div className="absolute top-0 left-0 w-full h-full border-8 border-blue-200 rounded-full animate-pulse"></div>
+              <div className="absolute top-0 left-0 w-full h-full border-t-8 border-blue-500 rounded-full animate-spin"></div>
+            </div>
+            <h2 className="text-2xl font-bold text-white mt-6">
+              Building Your Project
+            </h2>
+            <p className="text-gray-200 mt-2">
+              Please wait while we set everything up...
+            </p>
           </div>
         )}
       </div>
