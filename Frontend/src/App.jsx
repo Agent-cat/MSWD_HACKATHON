@@ -1,11 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
 import NavRoutes from "./routes/Navroutes";
+import { ToastProvider } from "./contexts/ToastContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <NavRoutes />
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <NavRoutes />
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
 

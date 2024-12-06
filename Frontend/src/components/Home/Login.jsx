@@ -22,6 +22,7 @@ function Login() {
         "http://localhost:3000/api/v1/auth/login",
         formData
       );
+
       localStorage.setItem("token", response.data.token);
       localStorage.setItem(
         "user",
@@ -31,7 +32,7 @@ function Login() {
           email: response.data.email,
         })
       );
-      navigate("/build");
+      navigate("/projects");
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
     } finally {

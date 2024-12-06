@@ -7,8 +7,11 @@ import MainLayout from "../Layout/MainLayout";
 import { DragDropContext } from "@hello-pangea/dnd";
 import Navbar from "../Navbar/Navbar";
 import StyleEditor from "../Editor/StyleEditor";
+import { useLocation } from "react-router-dom";
+import { projectService } from "../../services/projectService";
 
 function BuilderApp() {
+  const location = useLocation();
   const {
     elements,
     selectedElement,
@@ -23,23 +26,26 @@ function BuilderApp() {
 
   // Load current project when component mounts
   useEffect(() => {
-    const currentProject = localStorage.getItem("currentProject");
-    if (currentProject) {
-      try {
-        const project = JSON.parse(currentProject);
-        if (Array.isArray(project.elements)) {
-          updateElement(project.elements);
-        }
-      } catch (error) {
-        console.error("Error loading project:", error);
+    if (location.state?.project) {
+      const { elements } = location.state.project;
+      if (Array.isArray(elements)) {
+        updateElement(elements);
       }
     }
-  }, []);
+  }, [location.state]);
 
-  const handleElementsUpdate = (newElements) => {
+  const handleElementsUpdate = async (newElements) => {
     if (Array.isArray(newElements)) {
       updateElement(newElements);
-      saveToCurrentProject(newElements);
+      if (location.state?.project?._id) {
+        try {
+          await projectService.updateProject(location.state.project._id, {
+            elements: newElements,
+          });
+        } catch (error) {
+          console.error("Error saving project:", error);
+        }
+      }
     }
   };
 

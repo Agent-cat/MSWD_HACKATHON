@@ -6,6 +6,7 @@ import {
   FaTimes,
   FaClock,
 } from "react-icons/fa";
+import { projectService } from "../../services/projectService";
 
 function ProjectManager({ elements, onLoad }) {
   const [projectName, setProjectName] = useState("Untitled Project");
@@ -21,15 +22,14 @@ function ProjectManager({ elements, onLoad }) {
     setShowNamePrompt(true);
   };
 
-  const handleSaveConfirm = () => {
+  const handleSaveConfirm = async () => {
     const project = {
       name: projectName,
       elements: elements,
-      lastModified: new Date().toISOString(),
     };
 
     try {
-      localStorage.setItem(`project_${Date.now()}`, JSON.stringify(project));
+      await projectService.createProject(project);
       alert("Project saved successfully!");
       setShowNamePrompt(false);
     } catch (error) {
@@ -38,31 +38,19 @@ function ProjectManager({ elements, onLoad }) {
     }
   };
 
-  const loadProject = () => {
-    const loadedProjects = Object.entries(localStorage)
-      .filter(([key]) => key.startsWith("project_"))
-      .map(([key, value]) => {
-        try {
-          const parsed = JSON.parse(value);
-          return {
-            id: key,
-            ...parsed,
-          };
-        } catch (error) {
-          console.error("Error parsing project:", error);
-          return null;
-        }
-      })
-      .filter(Boolean)
-      .sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
-
-    if (loadedProjects.length === 0) {
-      alert("No saved projects found");
-      return;
+  const loadProject = async () => {
+    try {
+      const loadedProjects = await projectService.getAllProjects();
+      if (loadedProjects.length === 0) {
+        alert("No saved projects found");
+        return;
+      }
+      setProjects(loadedProjects);
+      setShowProjects(true);
+    } catch (error) {
+      console.error("Error loading projects:", error);
+      alert("Failed to load projects. Please try again.");
     }
-
-    setProjects(loadedProjects);
-    setShowProjects(true);
   };
 
   const handleProjectSelect = (project) => {
@@ -71,12 +59,18 @@ function ProjectManager({ elements, onLoad }) {
     setShowProjects(false);
   };
 
-  const deleteProject = (projectId) => {
+  const deleteProject = async (projectId, e) => {
+    e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this project?")) {
-      localStorage.removeItem(projectId);
-      setProjects(projects.filter((project) => project.id !== projectId));
-      if (projects.length <= 1) {
-        setShowProjects(false);
+      try {
+        await projectService.deleteProject(projectId);
+        setProjects(projects.filter((project) => project._id !== projectId));
+        if (projects.length <= 1) {
+          setShowProjects(false);
+        }
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        alert("Failed to delete project. Please try again.");
       }
     }
   };
@@ -156,7 +150,7 @@ function ProjectManager({ elements, onLoad }) {
             <div className="overflow-y-auto max-h-[60vh]">
               {projects.map((project) => (
                 <div
-                  key={project.id}
+                  key={project._id}
                   className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 border-b"
                 >
                   <div className="flex-1">
@@ -176,7 +170,7 @@ function ProjectManager({ elements, onLoad }) {
                       Load
                     </button>
                     <button
-                      onClick={() => deleteProject(project.id)}
+                      onClick={(e) => deleteProject(project._id, e)}
                       className="px-3 py-1.5 text-red-500 hover:text-red-600"
                     >
                       <FaTrash />

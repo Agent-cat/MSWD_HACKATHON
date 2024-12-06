@@ -7,6 +7,32 @@ const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({ message: "Please provide a valid email address" });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
+    }
+
+    // Validate username length
+    if (username.length < 3) {
+      return res
+        .status(400)
+        .json({ message: "Username must be at least 3 characters long" });
+    }
+
     // Check if user exists
     let user = await User.findOne({ email });
     if (user) {
@@ -37,6 +63,9 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Register error:", error);
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -44,40 +73,22 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
-
-    // Find user
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Create token
+    // Create token with userId
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
 
-    // Return user data and token
     res.json({
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        profilePicture: user.profilePicture,
-      },
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture,
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -87,6 +98,10 @@ const login = async (req, res) => {
 
 const me = async (req, res) => {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
     const user = await User.findById(req.user._id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -94,6 +109,9 @@ const me = async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error("Get user error:", error);
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -138,6 +156,12 @@ const updateProfile = async (req, res) => {
         return res
           .status(400)
           .json({ message: "Please provide a valid email address" });
+      }
+
+      // Check if email is already taken
+      const existingUser = await User.findOne({ email: updates.email });
+      if (existingUser && existingUser._id.toString() !== req.params.id) {
+        return res.status(400).json({ message: "Email already in use" });
       }
     }
 
@@ -188,6 +212,12 @@ const deleteUser = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+    if (!req.user || req.user._id.toString() !== req.params.id) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this user" });
+    }
+
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -206,6 +236,10 @@ const deleteUser = async (req, res) => {
 
 const getMe = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -213,6 +247,9 @@ const getMe = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error("Get current user error:", error);
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
     res
       .status(500)
       .json({ message: "Internal server error while fetching user" });
