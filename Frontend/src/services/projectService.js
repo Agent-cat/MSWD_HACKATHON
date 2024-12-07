@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getToken } from "../utils/auth";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://mswd-hackathon.onrender.com/api/v1";
 
 const axiosInstance = axios.create({
   baseURL: `${API_URL}/projects`,
@@ -10,7 +11,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add token to requests
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -30,7 +30,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log("Response:", {
@@ -56,9 +55,7 @@ export const projectService = {
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
-        // Handle unauthorized error
         console.error("Unauthorized access. Please log in again.");
-        // You might want to redirect to login or refresh token here
       }
       throw error;
     }

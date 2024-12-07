@@ -11,17 +11,14 @@ function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/login",
-        formData
-      );
+      const response = await axios.post(`${url}/api/v1/auth/login`, formData);
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem(

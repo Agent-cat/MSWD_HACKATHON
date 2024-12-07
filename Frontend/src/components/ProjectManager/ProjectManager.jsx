@@ -114,7 +114,6 @@ function ProjectManager({ elements, onLoad }) {
         </button>
       </div>
 
-      {/* Notification Toast */}
       {notification && (
         <div
           className={`fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
@@ -162,7 +161,6 @@ function ProjectManager({ elements, onLoad }) {
         </div>
       )}
 
-      {/* Project Selection Modal */}
       {showProjects && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">

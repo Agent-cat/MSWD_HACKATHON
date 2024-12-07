@@ -35,7 +35,7 @@ function Navbar({
   const [user, setUser] = useState(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [notification, setNotification] = useState(null);
-
+  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
@@ -48,23 +48,18 @@ function Navbar({
       return;
     }
 
-    // Load user data from localStorage
     const userData = localStorage.getItem("user");
     if (userData) {
       setUser(JSON.parse(userData));
     }
 
-    // Fetch fresh user data
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/auth/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${url}/api/v1/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const userData = {
           username: response.data.username,
           profilePicture: response.data.profilePicture,

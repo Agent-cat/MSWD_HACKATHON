@@ -31,7 +31,6 @@ function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Handle scroll events
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -45,7 +44,7 @@ function Home() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 80; // Account for fixed navbar
+      const offset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
 

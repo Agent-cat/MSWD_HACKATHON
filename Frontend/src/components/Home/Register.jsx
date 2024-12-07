@@ -18,6 +18,7 @@ function Register() {
   const [imagePreview, setImagePreview] = useState(null);
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState("");
+  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -62,7 +63,7 @@ function Register() {
     }
 
     try {
-      await axios.post(`http://localhost:3000/api/v1/auth/send-otp`, {
+      await axios.post(`${url}/api/v1/auth/send-otp`, {
         email: formData.email,
       });
       setShowOtpInput(true);
@@ -91,7 +92,7 @@ function Register() {
     }
 
     try {
-      await axios.post(`http://localhost:3000/api/v1/auth/verify-register`, {
+      await axios.post(`${url}/api/v1/auth/verify-register`, {
         ...formData,
         otp,
       });

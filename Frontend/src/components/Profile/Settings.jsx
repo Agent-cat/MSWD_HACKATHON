@@ -59,7 +59,6 @@ function Settings() {
             </div>
           </div>
 
-          {/* Tab Content */}
           <div className="p-6">
             {tabs.find((tab) => tab.id === activeTab)?.component}
           </div>
