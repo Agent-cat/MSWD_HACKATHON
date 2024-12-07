@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/config");
 const nodemailer = require("nodemailer");
 
-// Temporary OTP store (In production, use Redis or a database)
 const otpStore = new Map();
 
 const register = async (req, res) => {
@@ -21,37 +20,32 @@ const register = async (req, res) => {
         .json({ message: "Please provide a valid email address" });
     }
 
-    // Validate password length
     if (password.length < 6) {
       return res
         .status(400)
         .json({ message: "Password must be at least 6 characters long" });
     }
 
-    // Validate username length
     if (username.length < 3) {
       return res
         .status(400)
         .json({ message: "Username must be at least 3 characters long" });
     }
 
-    // Check if user exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create user - let the User model handle password hashing
     user = new User({
       username,
       email,
-      password, // The pre-save middleware will hash this
+      password,
       profilePicture,
     });
 
     await user.save();
 
-    // Create token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -78,34 +72,23 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Debug log
     console.log("Login attempt:", { email });
 
-    const user = await User.findOne({ email }).select("+password"); // Explicitly include password field
+    const user = await User.findOne({ email }).select("+password"); // Explicitly include
 
     if (!user) {
       console.log("User not found");
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Debug log
-    console.log("Found user:", {
-      id: user._id,
-      email: user.email,
-      hasPassword: !!user.password,
-    });
-
-    // Use the comparePassword method from the user model
     const isPasswordValid = await user.comparePassword(password);
 
-    // Debug log
     console.log("Password validation result:", isPasswordValid);
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Create token with userId
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -184,7 +167,6 @@ const updateProfile = async (req, res) => {
           .json({ message: "Please provide a valid email address" });
       }
 
-      // Check if email is already taken
       const existingUser = await User.findOne({ email: updates.email });
       if (existingUser && existingUser._id.toString() !== req.params.id) {
         return res.status(400).json({ message: "Email already in use" });
@@ -318,13 +300,11 @@ const sendVerificationOTP = async (req, res) => {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Check if email already exists
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Store OTP with expiration
     const salt = await bcrypt.genSalt(10);
     const hashedOTP = await bcrypt.hash(otp, salt);
 
@@ -333,7 +313,6 @@ const sendVerificationOTP = async (req, res) => {
       expires: Date.now() + 10 * 60 * 1000, // 10 minutes
     });
 
-    // Clean up OTP after expiration
     setTimeout(() => {
       otpStore.delete(email);
     }, 10 * 60 * 1000);
@@ -360,7 +339,6 @@ const verifyAndRegister = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Create verified user
     const user = new User({
       username,
       email,
@@ -371,7 +349,6 @@ const verifyAndRegister = async (req, res) => {
 
     await user.save();
 
-    // Clear OTP
     otpStore.delete(email);
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {

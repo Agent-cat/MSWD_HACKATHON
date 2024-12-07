@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getToken } from "./auth";
-
+const url =
+  import.meta.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
 const api = axios.create({
-  baseURL: "https://mswd-hackathon.onrender.com/api/v1",
+  baseURL: `${url}/api/v1`,
 });
 
 api.interceptors.request.use((config) => {
