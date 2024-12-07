@@ -1,6 +1,6 @@
 const Project = require("../models/project.model");
 
-exports.getAllProjects = async (req, res) => {
+const getAllProjects = async (req, res) => {
   try {
     console.log("Fetching projects for user:", req.user._id);
     const projects = await Project.find({ user: req.user._id }).sort({
@@ -14,7 +14,7 @@ exports.getAllProjects = async (req, res) => {
   }
 };
 
-exports.getProjectById = async (req, res) => {
+const getProjectById = async (req, res) => {
   try {
     if (!req.params.id) {
       return res.status(400).json({ message: "Project ID is required" });
@@ -39,7 +39,7 @@ exports.getProjectById = async (req, res) => {
   }
 };
 
-exports.createProject = async (req, res) => {
+const createProject = async (req, res) => {
   try {
     if (!req.body.name) {
       return res.status(400).json({ message: "Project name is required" });
@@ -63,7 +63,7 @@ exports.createProject = async (req, res) => {
   }
 };
 
-exports.updateProject = async (req, res) => {
+const updateProject = async (req, res) => {
   try {
     if (!req.params.id) {
       return res.status(400).json({ message: "Project ID is required" });
@@ -92,7 +92,7 @@ exports.updateProject = async (req, res) => {
   }
 };
 
-exports.deleteProject = async (req, res) => {
+const deleteProject = async (req, res) => {
   try {
     if (!req.params.id) {
       return res.status(400).json({ message: "Project ID is required" });
@@ -115,4 +115,23 @@ exports.deleteProject = async (req, res) => {
       .status(500)
       .json({ message: "Internal server error while deleting project" });
   }
+};
+
+const getUserProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({ user: req.user._id });
+    res.json(projects);
+  } catch (error) {
+    console.error("Error fetching user projects:", error);
+    res.status(500).json({ message: "Error fetching projects" });
+  }
+};
+
+module.exports = {
+  getAllProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject,
+  getUserProjects,
 };

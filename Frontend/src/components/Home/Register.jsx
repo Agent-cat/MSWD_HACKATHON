@@ -59,12 +59,8 @@ function Register() {
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:3000/api/v1/auth/register`,
-        formData
-      );
-      localStorage.setItem("token", response.data.token);
-      navigate("/build");
+      await axios.post(`http://localhost:3000/api/v1/auth/register`, formData);
+      navigate("/login");
     } catch (err) {
       console.error("Registration error:", err);
       setError(err.response?.data?.message || "An error occurred");

@@ -1,10 +1,8 @@
 import { useState } from "react";
 import api from "../../../utils/api";
-import { FaLock, FaSpinner, FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaLock, FaSpinner } from "react-icons/fa";
 
 function SecuritySettings() {
-  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [formData, setFormData] = useState({
@@ -50,117 +48,105 @@ function SecuritySettings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-        >
-          <FaArrowLeft className="mr-2" />
-          Back
-        </button>
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="flex items-center justify-between p-6 border-b">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Security Settings
+        </h2>
+      </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-4 md:p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Security Settings
-          </h2>
+      <div className="p-6">
+        {message.text && (
+          <div
+            className={`mb-6 p-4 rounded-md ${
+              message.type === "success"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
-          {message.text && (
-            <div
-              className={`p-4 rounded-lg mb-6 ${
-                message.type === "success"
-                  ? "bg-green-50 text-green-700"
-                  : "bg-red-50 text-red-700"
-              }`}
-            >
-              {message.text}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Current Password
+            </label>
+            <div className="relative">
+              <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="password"
+                value={formData.currentPassword}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    currentPassword: e.target.value,
+                  })
+                }
+                className="pl-10 w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
             </div>
-          )}
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
-                </label>
-                <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="password"
-                    value={formData.currentPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        currentPassword: e.target.value,
-                      })
-                    }
-                    className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
-                </label>
-                <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="password"
-                    value={formData.newPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        newPassword: e.target.value,
-                      })
-                    }
-                    className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
-                </label>
-                <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                    required
-                  />
-                </div>
-              </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              New Password
+            </label>
+            <div className="relative">
+              <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="password"
+                value={formData.newPassword}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    newPassword: e.target.value,
+                  })
+                }
+                className="pl-10 w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
             </div>
+          </div>
 
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={saving}
-                className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-              >
-                {saving ? (
-                  <>
-                    <FaSpinner className="animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Password"
-                )}
-              </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="pl-10 w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
             </div>
-          </form>
-        </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {saving ? (
+              <>
+                <FaSpinner className="animate-spin mr-2" />
+                Updating...
+              </>
+            ) : (
+              "Update Password"
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );

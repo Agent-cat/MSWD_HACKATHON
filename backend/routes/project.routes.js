@@ -7,12 +7,14 @@ const {
   createProject,
   updateProject,
   deleteProject,
-} = require("../controllers/project.controller.js");
+  getUserProjects,
+} = require("../controllers/project.controller");
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);
 
 // Project routes
+router.get("/user", getUserProjects);
 router.get("/", getAllProjects);
 router.get("/:id", getProjectById);
 router.post("/", createProject);
