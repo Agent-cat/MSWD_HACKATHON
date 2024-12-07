@@ -1,10 +1,11 @@
 import axios from "axios";
 import { getToken } from "../utils/auth";
 
-const API_URL = import.meta.env.BACKEND_URL;
+const API_URL =
+  import.meta.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
 
 const axiosInstance = axios.create({
-  baseURL: `${API_URL}/templates`,
+  baseURL: `${API_URL}/api/v1/templates`,
   headers: {
     "Content-Type": "application/json",
   },
