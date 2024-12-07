@@ -35,7 +35,7 @@ function Navbar({
   const [user, setUser] = useState(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [notification, setNotification] = useState(null);
-  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
+  const url = process.env.BACKEND_URL || "http://localhost:3000";
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);

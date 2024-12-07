@@ -18,36 +18,16 @@ function Register() {
   const [imagePreview, setImagePreview] = useState(null);
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState("");
-  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
+  const url = process.env.BACKEND_URL || "http://localhost:3000";
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append(
-        "upload_preset",
-        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "midland_property"
-      );
-
-      try {
-        const response = await axios.post(
-          `https://api.cloudinary.com/v1_1/vishnu2005/image/upload`,
-          formData
-        );
-        const imageUrl = response.data.secure_url;
-        setFormData((prev) => ({
-          ...prev,
-          profilePicture: imageUrl,
-        }));
-        setImagePreview(imageUrl);
-      } catch (err) {
-        console.error("Image upload error:", err);
-        setError("Failed to upload image");
-      } finally {
-        setLoading(false);
-      }
+      setFormData((prev) => ({
+        ...prev,
+        profilePicture: file,
+      }));
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -92,10 +72,25 @@ function Register() {
     }
 
     try {
+      const imageFormData = new FormData();
+      imageFormData.append("file", formData.profilePicture);
+      imageFormData.append(
+        "upload_preset",
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "midland_property"
+      );
+
+      const imageResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/vishnu2005/image/upload`,
+        imageFormData
+      );
+      const imageUrl = imageResponse.data.secure_url;
+
       await axios.post(`${url}/api/v1/auth/verify-register`, {
         ...formData,
+        profilePicture: imageUrl,
         otp,
       });
+
       showToast(
         "Registration successful! Please login to continue.",
         "success"

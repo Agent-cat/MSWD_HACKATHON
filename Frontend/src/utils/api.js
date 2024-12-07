@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth";
-const url =
-  import.meta.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
+const url = import.meta.env.BACKEND_URL || "http://localhost:3000";
 const api = axios.create({
   baseURL: `${url}/api/v1`,
 });

@@ -11,7 +11,7 @@ function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const url = process.env.BACKEND_URL || "https://mswd-hackathon.onrender.com";
+  const url = process.env.BACKEND_URL || "http://localhost:3000";
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
