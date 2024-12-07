@@ -9,7 +9,6 @@ async function seedTemplates() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log("Connected to MongoDB");
 
-    // Find admin user or create one
     let adminUser = await User.findOne({ email: "admin@example.com" });
     if (!adminUser) {
       try {
@@ -19,7 +18,6 @@ async function seedTemplates() {
           password: "admin123",
         });
       } catch (error) {
-        // If creation fails due to duplicate username, try finding by username instead
         if (error.code === 11000) {
           adminUser = await User.findOne({ username: "admin" });
         } else {

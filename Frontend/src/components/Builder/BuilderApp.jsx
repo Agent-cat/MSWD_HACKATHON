@@ -24,12 +24,10 @@ function BuilderApp() {
   const [showLayers, setShowLayers] = useState(false);
   const [deviceWidth, setDeviceWidth] = useState("100%");
 
-  // Load current project when component mounts
   useEffect(() => {
     if (location.state?.project) {
       const { elements } = location.state.project;
       if (Array.isArray(elements)) {
-        // Ensure all element properties are preserved
         const completeElements = elements.map((element) => ({
           ...element,
           content: element.content || "",
@@ -44,7 +42,6 @@ function BuilderApp() {
 
   const handleElementsUpdate = async (newElements) => {
     if (Array.isArray(newElements)) {
-      // Ensure all element properties are included
       const completeElements = newElements.map((element) => ({
         id: element.id,
         type: element.type,
@@ -56,8 +53,8 @@ function BuilderApp() {
         styles: element.styles || {},
         locked: element.locked || false,
         hidden: element.hidden || false,
-        src: element.src, // For image elements
-        placeholder: element.placeholder, // For input elements
+        src: element.src,
+        placeholder: element.placeholder,
       }));
 
       updateElement(completeElements);

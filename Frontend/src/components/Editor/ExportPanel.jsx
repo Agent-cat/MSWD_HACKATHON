@@ -11,10 +11,66 @@ import { generateReactComponent } from "../../utils/exportUtils";
 function ExportPanel({ elements, onClose }) {
   const [exportType, setExportType] = useState("html");
 
+  const renderElement = (element) => {
+    switch (element.type) {
+      case "heading":
+        return `<h1 style="${generateStyles(element.styles)}">${
+          element.content
+        }</h1>`;
+      case "paragraph":
+        return `<p style="${generateStyles(element.styles)}">${
+          element.content
+        }</p>`;
+      case "button":
+        return `<button style="${generateStyles(element.styles)}">${
+          element.content
+        }</button>`;
+      case "image":
+        return `<img src="${element.src}" alt="${
+          element.alt || ""
+        }" style="${generateStyles(element.styles)}" />`;
+      case "input":
+        return `<input type="${element.inputType || "text"}" placeholder="${
+          element.placeholder || ""
+        }" style="${generateStyles(element.styles)}" />`;
+      case "link":
+        return `<a href="${element.url || "#"}" style="${generateStyles(
+          element.styles
+        )}">${element.content}</a>`;
+      case "youtube":
+        return `<iframe 
+          src="${element.videoUrl}"
+          style="${generateStyles(element.styles)}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>`;
+      default:
+        return "";
+    }
+  };
+
+  const generateStyles = (styles) => {
+    if (!styles) return "";
+    return Object.entries(styles)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("; ");
+  };
+
   const handleExport = () => {
     switch (exportType) {
       case "html":
-        const htmlContent = elements
+        const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Design</title>
+</head>
+<body>
+    <div style="position: relative; width: 100%; min-height: 100vh;">
+        ${elements
           .map(
             (el) =>
               `<div style="position: absolute; left: ${el.x}px; top: ${
@@ -23,7 +79,10 @@ function ExportPanel({ elements, onClose }) {
                 ${renderElement(el)}
               </div>`
           )
-          .join("\n");
+          .join("\n")}
+    </div>
+</body>
+</html>`;
         downloadFile(htmlContent, "export.html", "text/html");
         break;
 

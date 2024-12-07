@@ -45,10 +45,10 @@ function Login() {
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg space-y-8">
         <div>
           <h2 className="text-center text-4xl font-extrabold text-gray-900 tracking-tight">
-            Welcome Back
+            LOGIN
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to continue building amazing projects
+            Sign in to continue building projects
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

@@ -47,8 +47,7 @@ function ProjectSelectionScreen() {
         project._id
       );
 
-      // Add artificial delay of 1.5s
-      await new Promise((resolve) => setTimeout(resolve, 5500));
+      await new Promise((resolve) => setTimeout(resolve, 2500));
 
       navigate("/build", { state: { project: currentProject } });
     } catch (error) {

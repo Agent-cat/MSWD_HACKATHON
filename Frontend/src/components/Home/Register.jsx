@@ -2,18 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUser, FaEnvelope, FaLock, FaImage, FaSpinner } from "react-icons/fa";
+import { useToast } from "../../contexts/ToastContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    profilePicture: null, // Initialize as null
+    profilePicture: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -46,12 +50,40 @@ function Register() {
     }
   };
 
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    if (!formData.email) {
+      setError("Email is required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await axios.post(`http://localhost:3000/api/v1/auth/send-otp`, {
+        email: formData.email,
+      });
+      setShowOtpInput(true);
+      setError("");
+      showToast("OTP sent successfully! Please check your email.", "success");
+    } catch (err) {
+      console.error("OTP send error:", err);
+      setError(
+        err.response?.data?.message || "Failed to send OTP. Please try again."
+      );
+      showToast("Failed to send OTP. Please try again.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // Validate profile picture
     if (!formData.profilePicture) {
       setError("Please upload a profile picture");
       setLoading(false);
@@ -59,11 +91,19 @@ function Register() {
     }
 
     try {
-      await axios.post(`http://localhost:3000/api/v1/auth/register`, formData);
+      await axios.post(`http://localhost:3000/api/v1/auth/verify-register`, {
+        ...formData,
+        otp,
+      });
+      showToast(
+        "Registration successful! Please login to continue.",
+        "success"
+      );
       navigate("/login");
     } catch (err) {
       console.error("Registration error:", err);
       setError(err.response?.data?.message || "An error occurred");
+      showToast(err.response?.data?.message || "Registration failed", "error");
     } finally {
       setLoading(false);
     }
@@ -74,13 +114,16 @@ function Register() {
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg space-y-8">
         <div>
           <h2 className="text-center text-4xl font-extrabold text-gray-900 tracking-tight">
-            Join SaaS Builder
+            REGISTER
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Create an account to start building amazing projects
+            Create an account to start building projects
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form
+          className="mt-8 space-y-6"
+          onSubmit={showOtpInput ? handleSubmit : handleSendOtp}
+        >
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg text-sm">
               {error}
@@ -129,6 +172,19 @@ function Register() {
             </div>
           </div>
 
+          {showOtpInput ? (
+            <div className="relative">
+              <input
+                type="text"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="appearance-none relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter OTP"
+              />
+            </div>
+          ) : null}
+
           <div className="flex flex-col items-center justify-center space-y-4">
             {imagePreview ? (
               <div className="relative group">
@@ -172,8 +228,10 @@ function Register() {
           >
             {loading ? (
               <FaSpinner className="animate-spin mr-2" />
+            ) : showOtpInput ? (
+              "Verify & Create Account"
             ) : (
-              "Create Account"
+              "Send OTP"
             )}
           </button>
         </form>

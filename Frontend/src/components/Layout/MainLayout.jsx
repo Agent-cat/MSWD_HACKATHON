@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaBars, FaTimes, FaSun, FaMoon } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function MainLayout({ sidebar, navbar, content, styleEditor }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -40,19 +41,18 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
             >
               {isSidebarOpen ? <FaTimes /> : <FaBars />}
             </button>
-            <span
+            <Link
+              to="/"
               className={`font-bold text-xl ${
                 isDarkMode ? "text-white" : "text-gray-800"
               } hidden sm:inline`}
             >
               WEB BUILD
-            </span>
+            </Link>
           </div>
 
-          {/* Navbar Content */}
           <div className="flex-1 ml-4 overflow-x-auto">{navbar}</div>
 
-          {/* Theme Toggle */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             className={`p-2 rounded-lg ${

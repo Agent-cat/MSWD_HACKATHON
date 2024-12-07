@@ -14,16 +14,13 @@ import TemplateGallery from "../components/Templates/TemplateGallery";
 const Navroutes = () => {
   return (
     <Routes>
-      {/* Public Routes - Accessible to everyone */}
       <Route path="/" element={<Home />} />
 
-      {/* Public Routes - Accessible only when not logged in */}
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Protected Routes - Accessible only when logged in */}
       <Route element={<PrivateRoute />}>
         <Route path="/projects" element={<ProjectSelectionScreen />} />
         <Route path="/build" element={<BuilderApp />} />
@@ -32,7 +29,6 @@ const Navroutes = () => {
         <Route path="/templates" element={<TemplateGallery />} />
       </Route>
 
-      {/* Catch all route - Redirect based on auth status */}
       <Route
         path="*"
         element={
