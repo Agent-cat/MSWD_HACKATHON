@@ -5,13 +5,11 @@ const { JWT_SECRET } = require("../config/config");
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, profilePicture } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !profilePicture) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res
@@ -44,6 +42,7 @@ const register = async (req, res) => {
       username,
       email,
       password, // The pre-save middleware will hash this
+      profilePicture,
     });
 
     await user.save();
@@ -59,6 +58,7 @@ const register = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
+        profilePicture: user.profilePicture,
       },
     });
   } catch (error) {

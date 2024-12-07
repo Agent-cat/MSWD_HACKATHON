@@ -17,6 +17,8 @@
     "@liveblocks/react": "^2.13.1",
     "@monaco-editor/react": "^4.6.0",
     "axios": "^1.7.9",
+    "cloudinary-react": "^1.8.1",
+    "dotenv": "^16.4.7",
     "framer-motion": "^11.13.1",
     "gsap": "^3.12.5",
     "monaco-editor": "^0.52.0",

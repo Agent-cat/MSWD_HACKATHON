@@ -9,7 +9,7 @@ function Register() {
     username: "",
     email: "",
     password: "",
-    profilePicture: "",
+    profilePicture: null, // Initialize as null
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,19 +21,24 @@ function Register() {
       setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "your_cloudinary_upload_preset");
+      formData.append(
+        "upload_preset",
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "midland_property"
+      );
 
       try {
         const response = await axios.post(
-          `https://api.cloudinary.com/v1_1/your_cloud_name/image/upload`,
+          `https://api.cloudinary.com/v1_1/vishnu2005/image/upload`,
           formData
         );
+        const imageUrl = response.data.secure_url;
         setFormData((prev) => ({
           ...prev,
-          profilePicture: response.data.secure_url,
+          profilePicture: imageUrl,
         }));
-        setImagePreview(response.data.secure_url);
+        setImagePreview(imageUrl);
       } catch (err) {
+        console.error("Image upload error:", err);
         setError("Failed to upload image");
       } finally {
         setLoading(false);
@@ -46,14 +51,22 @@ function Register() {
     setLoading(true);
     setError("");
 
+    // Validate profile picture
+    if (!formData.profilePicture) {
+      setError("Please upload a profile picture");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/register",
+        `http://localhost:3000/api/v1/auth/register`,
         formData
       );
       localStorage.setItem("token", response.data.token);
       navigate("/build");
     } catch (err) {
+      console.error("Registration error:", err);
       setError(err.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);
@@ -151,7 +164,9 @@ function Register() {
                 />
               </label>
             )}
-            <p className="text-sm text-gray-500">Upload profile picture</p>
+            <p className="text-sm text-gray-500">
+              Upload profile picture (required)
+            </p>
           </div>
 
           <button
