@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   FaDownload,
   FaLayerGroup,
@@ -10,11 +10,10 @@ import {
   FaUser,
   FaCog,
   FaSignOutAlt,
-  FaSave,
-  FaFolderOpen,
-  FaImages,
   FaExclamationCircle,
   FaCheckCircle,
+  FaSave,
+  FaFolderOpen,
 } from "react-icons/fa";
 import ExportPanel from "../Editor/ExportPanel";
 import { getToken } from "../../utils/auth";
@@ -185,7 +184,7 @@ function Navbar({
           }`}
         >
           <FaLayerGroup />
-          <span>Layers</span>
+          <span>View Page</span>
         </button>
 
         <button
@@ -205,14 +204,6 @@ function Navbar({
             <span>Delete</span>
           </button>
         )}
-
-        <Link
-          to="/templates"
-          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-        >
-          <FaImages className="text-blue-500" />
-          <span>Templates</span>
-        </Link>
       </div>
 
       <div className="flex items-center gap-4 pr-4">

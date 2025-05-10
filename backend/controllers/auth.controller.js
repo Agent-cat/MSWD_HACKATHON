@@ -82,7 +82,7 @@ const login = async (req, res) => {
     }
 
     const isPasswordValid = await user.comparePassword(password);
-
+    
     console.log("Password validation result:", isPasswordValid);
 
     if (!isPasswordValid) {

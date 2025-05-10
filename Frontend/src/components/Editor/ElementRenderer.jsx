@@ -20,7 +20,7 @@ const ElementRenderer = memo(({ element, onUpdate }) => {
     };
 
     switch (element.type) {
-      // Basic Elements
+      
       case "heading":
         return <div style={styles}>{element.content || "Heading"}</div>;
       case "paragraph":
@@ -67,7 +67,7 @@ const ElementRenderer = memo(({ element, onUpdate }) => {
           </a>
         );
 
-      // Form Elements
+    
       case "input":
         return (
           <input
@@ -97,7 +97,7 @@ const ElementRenderer = memo(({ element, onUpdate }) => {
           </div>
         );
 
-      // Layout Elements
+      
       case "container":
         return (
           <div
@@ -139,7 +139,7 @@ const ElementRenderer = memo(({ element, onUpdate }) => {
           </table>
         );
 
-      // Media Elements
+      
       case "video":
         return (
           <div style={styles}>

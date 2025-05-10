@@ -1,16 +1,6 @@
-import { useState } from "react";
-import {
-  FaTimes,
-  FaCode,
-  FaFileCode,
-  FaDownload,
-  FaReact,
-} from "react-icons/fa";
-import { generateReactComponent } from "../../utils/exportUtils";
+import { FaTimes, FaDownload } from "react-icons/fa";
 
 function ExportPanel({ elements, onClose }) {
-  const [exportType, setExportType] = useState("html");
-
   const renderElement = (element) => {
     switch (element.type) {
       case "heading":
@@ -58,56 +48,56 @@ function ExportPanel({ elements, onClose }) {
   };
 
   const handleExport = () => {
-    switch (exportType) {
-      case "html":
-        const htmlContent = `
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exported Design</title>
-</head>
-<body>
-    <div style="position: relative; width: 100%; min-height: 100vh;">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+        }
         ${elements
           .map(
             (el) =>
-              `<div style="position: absolute; left: ${el.x}px; top: ${
-                el.y
-              }px; width: ${el.width}px; height: ${el.height}px;">
+              `#element-${el.id} {
+                position: absolute;
+                left: ${el.x}px;
+                top: ${el.y}px;
+                width: ${el.width}px;
+                height: ${el.height}px;
+                ${Object.entries(el.styles || {})
+                  .map(([key, value]) => `${key}: ${value};`)
+                  .join("\n                ")}
+              }`
+          )
+          .join("\n\n")}
+    </style>
+</head>
+<body>
+    <div class="container">
+        ${elements
+          .map(
+            (el) =>
+              `<div id="element-${el.id}">
                 ${renderElement(el)}
               </div>`
           )
-          .join("\n")}
+          .join("\n        ")}
     </div>
 </body>
 </html>`;
-        downloadFile(htmlContent, "export.html", "text/html");
-        break;
-
-      case "css":
-        const cssContent = elements
-          .map(
-            (el) =>
-              `#element-${el.id} {
-                ${Object.entries(el.styles || {})
-                  .map(([key, value]) => `${key}: ${value};`)
-                  .join("\n  ")}
-              }`
-          )
-          .join("\n\n");
-        downloadFile(cssContent, "styles.css", "text/css");
-        break;
-
-      case "react":
-        const reactComponent = generateReactComponent(elements);
-        downloadFile(reactComponent, "ExportedCanvas.jsx", "text/javascript");
-        break;
-
-      default:
-        break;
-    }
+    console.log('Exported HTML Content:', htmlContent);
+    downloadFile(htmlContent, "export.html", "text/html");
   };
 
   const downloadFile = (content, filename, type) => {
@@ -136,49 +126,15 @@ function ExportPanel({ elements, onClose }) {
         </div>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <button
-              onClick={() => setExportType("html")}
-              className={`flex flex-col items-center gap-2 p-4 border rounded-lg ${
-                exportType === "html"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <FaCode className="text-2xl text-blue-500" />
-              <span className="font-medium">HTML</span>
-            </button>
-
-            <button
-              onClick={() => setExportType("css")}
-              className={`flex flex-col items-center gap-2 p-4 border rounded-lg ${
-                exportType === "css"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <FaFileCode className="text-2xl text-blue-500" />
-              <span className="font-medium">CSS</span>
-            </button>
-
-            <button
-              onClick={() => setExportType("react")}
-              className={`flex flex-col items-center gap-2 p-4 border rounded-lg ${
-                exportType === "react"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <FaReact className="text-2xl text-blue-500" />
-              <span className="font-medium">React</span>
-            </button>
-          </div>
+          <p className="text-gray-600 text-center">
+            Export your design as a standalone HTML file with embedded CSS styles.
+          </p>
 
           <button
             onClick={handleExport}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            <FaDownload /> Export {exportType.toUpperCase()}
+            <FaDownload /> Export HTML
           </button>
         </div>
       </div>

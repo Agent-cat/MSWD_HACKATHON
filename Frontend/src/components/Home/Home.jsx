@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../../utils/auth";
-import img1 from "../../assets/image.png";
-import img2 from "../../assets/image2.png";
 import { Link } from "react-router-dom";
 import {
   FaRocket,
