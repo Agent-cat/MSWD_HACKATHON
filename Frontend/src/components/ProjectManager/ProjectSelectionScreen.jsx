@@ -171,7 +171,7 @@ function ProjectSelectionScreen() {
           </div>
         )}
 
-        {/* New Project Modal */}
+       
         {showNewProjectModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-8 w-[450px] shadow-2xl transform transition-all scale-95 animate-[modal-pop_0.3s_ease-out_forwards]">
@@ -212,7 +212,7 @@ function ProjectSelectionScreen() {
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
+       
         {showConfirmDelete && projectToDelete && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-8 w-[450px] shadow-2xl transform transition-all scale-95 animate-[modal-pop_0.3s_ease-out_forwards]">

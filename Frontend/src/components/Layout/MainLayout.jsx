@@ -22,7 +22,7 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
 
   return (
     <div className={`h-screen flex flex-col bg-white`}>
-      {/* Top Navigation Bar */}
+      
       <div
         className={`h-14 border-b ${
           isDarkMode
@@ -31,7 +31,7 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
         } px-4`}
       >
         <div className="h-full flex items-center justify-between">
-          {/* Logo and Toggle */}
+         
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -64,9 +64,9 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
         </div>
       </div>
 
-      {/* Main Content Area */}
+     
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar with transition */}
+        
         <div
           className={`${isSidebarOpen ? "w-64" : "w-0"} ${
             isMobile ? "absolute z-50 h-full" : "relative"
@@ -81,7 +81,7 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
           </div>
         </div>
 
-        {/* Main Content with transition */}
+       
         <div
           className={`flex-1 flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out`}
           style={{
@@ -91,7 +91,7 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
           {content}
         </div>
 
-        {/* Style Editor - Mobile Bottom Sheet / Desktop Sidebar */}
+        
         {styleEditor && (
           <div
             className={`${
@@ -105,7 +105,7 @@ function MainLayout({ sidebar, navbar, content, styleEditor }) {
         )}
       </div>
 
-      {/* Mobile Overlay when sidebar is open */}
+      
       {isMobile && isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"

@@ -53,7 +53,7 @@ function Profile() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header with Back Button */}
+        
         <div className="flex items-center mb-8">
           <button
             onClick={() => navigate(-1)}
@@ -65,7 +65,7 @@ function Profile() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Card */}
+          
           <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-1">
             <div className="flex flex-col items-center">
               <div className="relative group mb-6">
@@ -101,9 +101,9 @@ function Profile() {
             </div>
           </div>
 
-          {/* Right Column - Stats & Activity */}
+          
           <div className="lg:col-span-2 space-y-8">
-            {/* Stats Cards */}
+           
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div
                 onClick={() => navigate("/projects")}
@@ -144,7 +144,7 @@ function Profile() {
               </div>
             </div>
 
-            {/* Recent Activity Section */}
+           
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6">
                 Recent Activity

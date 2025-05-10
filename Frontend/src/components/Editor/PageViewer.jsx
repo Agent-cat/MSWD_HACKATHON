@@ -62,13 +62,60 @@ function PageViewer() {
   const renderElement = (element) => {
     if (!element) return null;
 
+
+    const processStyleValue = (value) => {
+      if (typeof value === 'string') {
+        
+        if (value.endsWith('px')) {
+          return value;
+        }
+        
+        if (value.endsWith('%')) {
+          return value;
+        }
+        
+        if (value.startsWith('#') || value.startsWith('rgb')) {
+          return value;
+        }
+        
+        return value;
+      }
+      return value;
+    };
+
     const baseStyle = {
       ...element.style,
       position: element.style?.position || "relative",
-      width: element.style?.width || "100%",
-      height: element.style?.height || "auto",
-      margin: element.style?.margin || "0",
-      padding: element.style?.padding || "0",
+      width: processStyleValue(element.style?.width) || "100%",
+      height: processStyleValue(element.style?.height) || "auto",
+      margin: processStyleValue(element.style?.margin) || "0",
+      padding: processStyleValue(element.style?.padding) || "0",
+      display: element.style?.display || "block",
+      flexDirection: element.style?.flexDirection || "row",
+      justifyContent: element.style?.justifyContent || "flex-start",
+      alignItems: element.style?.alignItems || "stretch",
+      gap: processStyleValue(element.style?.gap) || "0",
+      backgroundColor: element.style?.backgroundColor || "transparent",
+      color: element.style?.color || "inherit",
+      fontSize: processStyleValue(element.style?.fontSize) || "inherit",
+      fontWeight: element.style?.fontWeight || "normal",
+      textAlign: element.style?.textAlign || "left",
+      borderRadius: processStyleValue(element.style?.borderRadius) || "0",
+      border: element.style?.border || "none",
+      boxShadow: element.style?.boxShadow || "none",
+      opacity: element.style?.opacity || 1,
+      transform: element.style?.transform || "none",
+      transition: "all 0.3s ease",
+      zIndex: element.style?.zIndex || "auto",
+      overflow: element.style?.overflow || "visible",
+      backgroundImage: element.style?.backgroundImage || "none",
+      backgroundSize: element.style?.backgroundSize || "cover",
+      backgroundPosition: element.style?.backgroundPosition || "center",
+      backgroundRepeat: element.style?.backgroundRepeat || "no-repeat",
+      minWidth: processStyleValue(element.style?.minWidth) || "auto",
+      maxWidth: processStyleValue(element.style?.maxWidth) || "none",
+      minHeight: processStyleValue(element.style?.minHeight) || "auto",
+      maxHeight: processStyleValue(element.style?.maxHeight) || "none",
     };
 
     switch (element.type) {
@@ -76,7 +123,6 @@ function PageViewer() {
         return (
           <h1
             key={element._id}
-            className="text-4xl font-bold mb-4"
             style={baseStyle}
           >
             {element.content}
@@ -84,7 +130,7 @@ function PageViewer() {
         );
       case "paragraph":
         return (
-          <p key={element._id} className="mb-4" style={baseStyle}>
+          <p key={element._id} style={baseStyle}>
             {element.content}
           </p>
         );
@@ -92,7 +138,6 @@ function PageViewer() {
         return (
           <button
             key={element._id}
-            className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
             style={baseStyle}
           >
             {element.content}
@@ -104,7 +149,6 @@ function PageViewer() {
             key={element._id}
             src={element.content}
             alt={element.alt || "Image"}
-            className="max-w-full h-auto rounded-lg"
             style={baseStyle}
           />
         );
@@ -112,7 +156,6 @@ function PageViewer() {
         return (
           <div
             key={element._id}
-            className="p-4 border rounded-lg"
             style={baseStyle}
           >
             {element.children?.map((child) => renderElement(child))}
@@ -128,7 +171,6 @@ function PageViewer() {
         return (
           <hr
             key={element._id}
-            className="my-4 border-t border-gray-200"
             style={baseStyle}
           />
         );
@@ -139,8 +181,8 @@ function PageViewer() {
 
   if (loading) {
     return (
-      <div className="min-h-screen  bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-8 shadow-lg">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           <p className="mt-4 text-gray-600">Loading project...</p>
         </div>
@@ -151,7 +193,7 @@ function PageViewer() {
   if (error) {
     return (
       <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8 max-w-md">
+        <div className="bg-white rounded-lg p-8 max-w-md shadow-lg">
           <div className="text-red-500 mb-4">
             <FaArrowLeft className="text-2xl" />
           </div>
@@ -159,7 +201,7 @@ function PageViewer() {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Go Back
           </button>
@@ -170,7 +212,7 @@ function PageViewer() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50">
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-4">
@@ -215,13 +257,15 @@ function PageViewer() {
         </div>
       </div>
 
-      <div className="max-w-full mx-auto h-screen">
+      <div className="max-w-full mx-auto h-screen overflow-auto">
         <div
           className="mx-auto bg-white shadow-lg"
           style={{
             width: getViewportWidth(),
             minHeight: "100%",
             transition: "width 0.3s ease-in-out",
+            margin: "0 auto",
+            padding: "2rem",
           }}
         >
           <div className="p-8">
