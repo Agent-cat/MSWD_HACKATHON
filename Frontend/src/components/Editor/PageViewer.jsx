@@ -233,6 +233,7 @@ function PageViewer() {
                 title="Mobile View"
               >
                 <FaMobile />
+                
               </button>
               <button
                 onClick={() => setViewport("tablet")}
