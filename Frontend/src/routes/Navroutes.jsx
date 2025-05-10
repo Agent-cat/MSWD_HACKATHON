@@ -10,6 +10,7 @@ import PublicRoute from "./PublicRoute";
 import { getToken } from "../utils/auth";
 import ProjectSelectionScreen from "../components/ProjectManager/ProjectSelectionScreen";
 import TemplateGallery from "../components/Templates/TemplateGallery";
+import PageViewer from "../components/Editor/PageViewer";
 
 const Navroutes = () => {
   return (
@@ -27,6 +28,7 @@ const Navroutes = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/templates" element={<TemplateGallery />} />
+        <Route path="/preview/:projectId" element={<PageViewer />} />
       </Route>
 
       <Route

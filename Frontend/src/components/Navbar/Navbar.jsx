@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaDownload,
   FaLayerGroup,
@@ -16,6 +16,7 @@ import {
   FaFolderOpen,
 } from "react-icons/fa";
 import ExportPanel from "../Editor/ExportPanel";
+import PageViewer from "../Editor/PageViewer";
 import { getToken } from "../../utils/auth";
 import axios from "axios";
 
@@ -29,8 +30,10 @@ function Navbar({
   onDeviceChange,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPageViewer, setShowPageViewer] = useState(false);
   const [user, setUser] = useState(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -120,6 +123,15 @@ function Navbar({
     }
   };
 
+  const handleViewPage = () => {
+    const projectId = location.state?.project?._id;
+    if (projectId) {
+      window.open(`/preview/${projectId}`, '_blank');
+    } else {
+      showNotification("No project selected", "error");
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showProfileDropdown && !event.target.closest(".profile-dropdown")) {
@@ -176,7 +188,7 @@ function Navbar({
         </div>
 
         <button
-          onClick={() => setShowLayers(!showLayers)}
+          onClick={handleViewPage}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
             showLayers
               ? "bg-blue-100 text-blue-700"
@@ -291,6 +303,13 @@ function Navbar({
           </div>
         )}
       </div>
+
+      {showPageViewer && (
+        <PageViewer
+          projectId={location.state?.project?._id}
+          onClose={() => setShowPageViewer(false)}
+        />
+      )}
 
       {showExportModal && (
         <ExportPanel

@@ -329,23 +329,15 @@ function Home() {
             variants={itemVariants}
           >
             <motion.div
-              className="relative z-10 rounded-xl shadow-2xl overflow-hidden"
+              className="relative z-10 rounded-xl shadow-2xl overflow-hidden bg-gray-100 h-96"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <motion.img
-                src={img1}
-                alt="WebBuild Interface"
-                className="w-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </motion.div>
 
             <motion.div
-              className="absolute -bottom-10 right-5 sm:right-10 w-2/3 sm:w-1/2 rounded-xl shadow-2xl overflow-hidden border-4 border-white"
+              className="absolute -bottom-10 right-5 sm:right-10 w-2/3 sm:w-1/2 rounded-xl shadow-2xl overflow-hidden border-4 border-white bg-gray-100 h-64"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
             ></motion.div>
@@ -412,11 +404,7 @@ function Home() {
                 </ul>
               </div>
               <div className="md:w-1/2">
-                <img
-                  src={img2}
-                  alt="Customization Interface"
-                  className="rounded-lg shadow-xl"
-                />
+                <div className="rounded-lg shadow-xl bg-gray-100 h-64"></div>
               </div>
             </motion.div>
 
@@ -448,11 +436,7 @@ function Home() {
                 </ul>
               </div>
               <div className="md:w-1/2">
-                <img
-                  src={img1}
-                  alt="Project Management Tools"
-                  className="rounded-lg shadow-xl"
-                />
+                <div className="rounded-lg shadow-xl bg-gray-100 h-64"></div>
               </div>
             </motion.div>
 
@@ -485,11 +469,7 @@ function Home() {
                 </ul>
               </div>
               <div className="md:w-1/2">
-                <img
-                  src={img2}
-                  alt="Template Gallery"
-                  className="rounded-lg shadow-xl"
-                />
+                <div className="rounded-lg shadow-xl bg-gray-100 h-64"></div>
               </div>
             </motion.div>
           </motion.div>

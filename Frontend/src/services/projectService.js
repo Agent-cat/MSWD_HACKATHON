@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "../utils/auth";
 
-const API_URL = import.meta.env.BACKEND_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const axiosInstance = axios.create({
   baseURL: `${API_URL}/api/v1/projects`,
@@ -57,10 +57,18 @@ export const projectService = {
 
   getCurrentProject: async (id) => {
     try {
+      if (!id) {
+        throw new Error("Project ID is required");
+      }
+      console.log("Making request to:", `${API_URL}/api/v1/projects/${id}`);
       const response = await axiosInstance.get(`/${id}`);
+      console.log("Project response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching project:", error);
+      if (error.response?.status === 404) {
+        throw new Error("Project not found");
+      }
       throw error;
     }
   },
